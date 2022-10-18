@@ -1,3 +1,6 @@
+$build_folder = './target/debug'
+$temp_folder = './temp'
+
 $dep = "SFML-2.5.1"
 $dlls = (
     "openal32.dll",
@@ -7,72 +10,60 @@ $dlls = (
     "sfml-window-2.dll"
 )
 
-$dll_missing_run = @()
+$dll_missing = @()
 foreach ($dll in $dlls) {
-    if (!(Test-Path "./$dll")) {
-        $dll_missing_run += $dll
-    }
-}
-$dll_missing_build = @()
-foreach ($dll in $dlls) {
-    if (!(Test-Path "target/debug/$dll")) {
-        $dll_missing_build = $dll
+    if (!(Test-Path "$build_folder/$dll")) {
+        $dll_missing += $dll
     }
 }
 
-
-if ((("run" -in $args) -and $dll_missing_run) -or (("--build" -in $args) -and $dll_missing_build)) {
-    if (!(Test-Path "tmp")) {
-        New-Item "tmp" -Type Directory >$null
-        Write-Host "'./tmp' created."
+if (("build" -in $args) -and $dll_missing) {
+    if (!(Test-Path $temp_folder)) {
+        New-Item $temp_folder -Type Directory >$null
+        Write-Host "'$temp_folder' created."
     }
     
-    if (!(Test-Path "tmp/$dep.zip")) {
+    if (!(Test-Path "$temp_folder/$dep.zip")) {
         Write-Host "Downloading 'https://www.sfml-dev.org/files/$dep-windows-vc15-64-bit.zip' . . ."
-        Invoke-WebRequest -Uri "https://www.sfml-dev.org/files/$dep-windows-vc15-64-bit.zip" -OutFile "tmp/$dep.zip" >$null
+        Invoke-WebRequest -Uri "https://www.sfml-dev.org/files/$dep-windows-vc15-64-bit.zip" -OutFile "$temp_folder/$dep.zip" >$null
     }
     
-    if (!(Test-Path "tmp/$dep")) {
-        Expand-Archive "tmp/$dep.zip" -DestinationPath "tmp/" -Force >$null
-        Write-Host "'tmp/$dep.zip' to 'tmp/$dep' extracted."
-    }
-}
+    if (!(Test-Path "$temp_folder/$dep")) {
+        Expand-Archive "$temp_folder/$dep.zip" -DestinationPath "$temp_folder/" -Force >$null
+        Write-Host "'$temp_folder/$dep.zip' extracted."
 
-
-if ("run" -in $args) {
-    foreach ($dll in $dll_missing_run) {
-        Copy-Item -Path "tmp/$dep/bin/$dll" -Destination . -PassThru >$null
-        Write-Host "'./$dll' created."
+        Get-ChildItem -Path "$temp_folder/$dep" -Exclude 'bin' |
+        ForEach-Object {Remove-Item $_ -Recurse }
+        Write-Host "Removed unnecessary items inside '$temp_folder/$dep'."
     }
+
+    Remove-Item "$temp_folder/$dep.zip"
+    Write-Host "Removed '$temp_folder/$dep.zip'."
 }
 
 if ("build" -in $args)  {
-    if (Test-Path "target/debug/") {
-        foreach ($dll in $dll_missing_build) {
-            Copy-Item -Path $dll -Destination "target/debug/" -PassThru >$null
-            Write-Host "'target/debug/$dll' created."
+    if (Test-Path $build_folder) {
+        foreach ($dll in $dll_missing) {
+            Copy-Item -Path "$temp_folder/$dep/bin/$dll" -Destination "$build_folder/" -PassThru >$null
+            Write-Host "'$build_folder/$dll' created."
         }
     }
     else {
-        Write-Host "Make sure to run: cargo build"
+        Write-Host "'$build_folder' does not exist. Make sure to run: cargo build"
     }
 }
 
 if ("clean" -in $args) {
-    foreach ($dll in $dlls) {
-        if (Test-Path "./$dll") {
-            Remove-Item -Path "./$dll"
-            Write-Host "'./$dll' removed."
-        }
+    if (Test-Path $temp_folder) {
+        Remove-Item -Path $temp_folder -Recurse
+        Write-Host "'$temp_folder' removed."
     }
-    foreach ($dll in $dlls) {
-        if (Test-Path "target/debug/$dll") {
-            Remove-Item -Path "target/debug/$dll"
-            Write-Host "'target/debug/$dll' removed."
+    if ("*" -in $args) {
+        foreach ($dll in $dlls) {
+            if (Test-Path $build_folder/$dll) {
+                Remove-Item -Path "$build_folder/$dll"
+                Write-Host "'$build_folder/$dll' removed."
+            }
         }
-    }
-    if ((Test-Path "tmp") -and ("*" -in $args)) {
-        Remove-Item -LiteralPath "tmp" -Force -Recurse
-        Write-Host "'tmp' removed."
     }
 }
