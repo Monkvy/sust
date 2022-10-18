@@ -1,6 +1,6 @@
 
 fn events(_: winit::event::Event<()>) {
-    
+
 }
 
 

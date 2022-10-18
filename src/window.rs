@@ -1,9 +1,3 @@
-/*
-use winit::{
-    event::{Event, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
-    window::WindowBuilder
-};*/
 use crate::Vector;
 use crate::err;
 
