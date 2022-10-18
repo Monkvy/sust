@@ -1,6 +1,7 @@
 
-fn events(_: winit::event::Event<()>) {
-
+fn events(e: &winit::event::WindowEvent) -> bool {
+    println!("{:?}", e);
+    false
 }
 
 
@@ -10,8 +11,8 @@ fn main() -> Result<(), sust::err::Error> {
 
     println!("{:?}", a.cast::<f32>() + b);
 
-    let window = sust::window::new("Sust window", sust::Vector(400, 400), Some(sust::Vector(400, 400)))?;
-    window.run(events)?;
+    let window = sust::window::new("Sust window", sust::Vector(400, 400), Some(sust::Vector(400, 400)));
+    pollster::block_on(window.run(events))?;
 
     Ok(())
 }

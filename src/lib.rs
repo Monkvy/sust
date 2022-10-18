@@ -6,3 +6,4 @@ pub mod vector;
 pub use vector::Vector;
 
 pub mod window;
+pub use window::Window;
