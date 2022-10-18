@@ -6,9 +6,4 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-winit = "0.27.4"        # Window managment
-env_logger = "0.9.1"    # Logger
 num = "0.4.0"           # Vector
-wgpu = "0.13"           # Gpu render
-pollster = "0.2"        # await, async
-# log = "0.4"
