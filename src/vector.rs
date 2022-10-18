@@ -1,5 +1,4 @@
 use std::ops::{Add, Sub, Mul, Div, Neg};
-use winit::dpi::{LogicalPosition, PhysicalPosition, LogicalSize, PhysicalSize};
 
 
 /// A Vector can represent a point / a direction ...  containing one x & y coordinate
@@ -54,20 +53,6 @@ impl<T: num::Num + num::NumCast + Copy> Vector<T> {
             new.1 = new.1 / mag;
         }
         new
-    }
-
-    // Winit vector conversion
-    pub fn logical_pos(self) -> LogicalPosition<T> {
-        LogicalPosition { x: self.0, y: self.1 }
-    }
-    pub fn physical_pos(self) -> PhysicalPosition<T> {
-        PhysicalPosition { x: self.0, y: self.1 }
-    }
-    pub fn logical_size(self) -> LogicalSize<T> {
-        LogicalSize { width: self.0, height: self.1 }
-    }
-    pub fn physical_size(self) -> PhysicalSize<T> {
-        PhysicalSize { width: self.0, height: self.1 }
     }
 }
 
