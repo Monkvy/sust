@@ -1,4 +1,8 @@
 
+fn events(event: winit::event::Event<()>) {
+    
+}
+
 
 fn main() -> Result<(), sust::err::Error> {
     let a = sust::Vector(4, 2);
@@ -6,6 +10,8 @@ fn main() -> Result<(), sust::err::Error> {
 
     println!("{:?}", a.cast::<f32>() + b);
 
-    //sust::window::new("Sust window", sust::Vector(400, 400), Some(sust::Vector(0, 0)))?;
+    let window = sust::window::new("Sust window", sust::Vector(400, 400), Some(sust::Vector(400, 400)))?;
+    window.run(events)?;
+
     Ok(())
 }
