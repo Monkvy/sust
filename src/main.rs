@@ -1,5 +1,5 @@
 
-fn events(event: winit::event::Event<()>) {
+fn events(_: winit::event::Event<()>) {
     
 }
 
