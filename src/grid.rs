@@ -27,7 +27,7 @@ impl<T: Cell + Clone> Grid<T> {
     }
 
     pub fn win_conf(&self) -> Config {
-        Config::Grid { rows: self.rows, cols: self.cols, scale: self.scale }
+        Config::grid(self.rows, self.cols, self.scale)
     }
 
     pub fn get_size(&self) -> Vector<u16> {
