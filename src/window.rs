@@ -49,9 +49,13 @@ impl Config {
 }
 
 
-pub fn run<T: App> (
-    title: &str, config: Config, mut app: T
-) {
+/// Runs the main loop of the window.
+/// 
+/// ### Arguments
+/// * `title`: &[str] - The window title.
+/// * `config`: [Config] - The window config.
+/// * `app`: mut [App] - Your application struct.
+pub fn run<T: App> (title: &str, config: Config, mut app: T) {
     let mut window = RenderWindow::new(
         config.size,
         title,
@@ -71,8 +75,8 @@ pub fn run<T: App> (
             }
         }
 
+        // TODO: Calculate dt
         app.update(0.);
-
         window.clear(Color::BLACK);
         app.render(&mut window);
         window.display();
