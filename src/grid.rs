@@ -1,4 +1,4 @@
-use crate::{WindowConfig, Color, Vector, RenderWindow, Rect};
+use crate::{Config, Color, Vector, RenderWindow, Rect};
 
 
 pub trait Cell {
@@ -26,8 +26,8 @@ impl<T: Cell + Clone> Grid<T> {
         Grid::<T> { rows, cols, scale, cells: vec![vec![T::default(); cols as usize]; rows as usize] }
     }
 
-    pub fn win_conf(&self) -> WindowConfig {
-        WindowConfig::Grid { rows: self.rows, cols: self.cols, scale: self.scale }
+    pub fn win_conf(&self) -> Config {
+        Config::Grid { rows: self.rows, cols: self.cols, scale: self.scale }
     }
 
     pub fn get_size(&self) -> Vector<u16> {
@@ -41,7 +41,7 @@ impl<T: Cell + Clone> Grid<T> {
     pub fn map_vec<V: Into<Vector<u16>>>(&mut self, vec: V) -> Option<&mut T> {
         let v: Vector<u16> = vec.try_into().unwrap();
         let pos = v / self.scale;
-        
+
         if pos.1 >= self.rows || pos.0 >= self.cols { return None }
         Some(&mut self.cells[pos.1 as usize][pos.0 as usize])
     }

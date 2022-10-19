@@ -6,37 +6,51 @@ use sfml::{
 };
 
 
-pub enum WindowConfig {
+pub enum Config {
+    All {size: Vector<u16>, pos: Vector<i32>, style: Style},
     Size {size: Vector<u16>},
-    SizePos {size: Vector<u16>, pos: Vector<i32>},
+    Pos {size: Vector<u16>, pos: Vector<i32>},
     Grid {rows: u16, cols: u16, scale: u16},
-    All {size: Vector<u16>, pos: Vector<i32>, style: Style}
+}
+impl Config {
+    pub fn new<Vu16: Into<Vector<u16>>, Vi32: Into<Vector<i32>>>(size: Vu16, pos: Vi32, style: Style) -> Config {
+        Config::All { size: size.try_into().unwrap(), pos: pos.try_into().unwrap(), style }
+    }
+    pub fn size<V: Into<Vector<u16>>>(size: V) -> Config {
+        Config::Size { size: size.try_into().unwrap() }
+    }
+    pub fn pos<Vu16: Into<Vector<u16>>, Vi32: Into<Vector<i32>>>(size: Vu16, pos: Vi32) -> Config {
+        Config::Pos { size: size.try_into().unwrap(), pos: pos.try_into().unwrap() }
+    }
+    pub fn grid(rows: u16, cols: u16, scale: u16) -> Config {
+        Config::Grid { rows, cols, scale }
+    }
 }
 
-pub struct WindowConfigRes {
+pub struct ConfigRes {
     size: Vector<u16>,
     pos: Vector<i32>,
     style: Style
 }
 
-impl WindowConfig {
-    pub fn get(self) -> WindowConfigRes {
+impl Config {
+    pub fn get(self) -> ConfigRes {
         match self {
-            WindowConfig::Size { size } => WindowConfigRes {
+            Config::Size { size } => ConfigRes {
                 size,
                 pos: Vector(150, 150),
                 style: Style::CLOSE
             },
-            WindowConfig::SizePos { size, pos } => WindowConfigRes { 
+            Config::Pos { size, pos } => ConfigRes { 
                 size, pos,
                 style: Style::CLOSE
             },
-            WindowConfig::Grid { rows, cols, scale } => WindowConfigRes { 
+            Config::Grid { rows, cols, scale } => ConfigRes { 
                 size: Vector(rows * scale, cols * scale),
                 pos: Vector(150, 150),
                 style: Style::CLOSE
             },
-            WindowConfig::All { size, pos, style } => WindowConfigRes { 
+            Config::All { size, pos, style } => ConfigRes { 
                 size, pos, style
             },
         }
@@ -47,7 +61,7 @@ impl WindowConfig {
 // size: Vector<u16>, pos: Option<Vector<u16>>, 
 
 pub fn run<T: App> (
-    title: &str, config: WindowConfig, mut app: T
+    title: &str, config: Config, mut app: T
 ) {
     let config_final = config.get();
     let mut window = RenderWindow::new(
