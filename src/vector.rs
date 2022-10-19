@@ -1,4 +1,5 @@
 use std::ops::{Add, Sub, Mul, Div, Neg};
+use sfml::window::VideoMode;
 
 
 /// A Vector can represent a point / a direction ...  containing one x & y coordinate
@@ -56,6 +57,23 @@ impl<T: num::Num + num::NumCast + Copy> Vector<T> {
     }
 }
 
+
+// Into implementations
+impl<T: num::Num + num::NumCast> Into<VideoMode> for Vector<T> {
+    fn into(self) -> VideoMode {
+        VideoMode { 
+            width: num::cast(self.0).unwrap(), 
+            height: num::cast(self.1).unwrap(), 
+            bits_per_pixel: VideoMode::desktop_mode().bits_per_pixel 
+        }
+    }
+}
+
+impl<T: num::Num> Into<Vector<T>> for (T, T)  {
+    fn into(self) -> Vector<T> {
+        Vector(self.0, self.1)
+    }
+}
 
 // <========================================>
 // <=== Arith. Operator with rhs: Vector ===>
