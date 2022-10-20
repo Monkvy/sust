@@ -108,6 +108,9 @@ pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiCo
                     MOUSE_STATE.lock().unwrap().button = None;
                     MOUSE_STATE.lock().unwrap().pos = Vector(x as u16, y as u16);
                 }
+                Event::MouseMoved { x, y } if MOUSE_STATE.lock().unwrap().button.is_some() => {
+                    MOUSE_STATE.lock().unwrap().pos = Vector(x as u16, y as u16);
+                }
                 _ => { if app.events(event) {break;} }
             }
         }
