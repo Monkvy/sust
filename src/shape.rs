@@ -64,7 +64,7 @@ pub struct Circle {
     border_color: Option<Color>,
 }
 impl Circle {
-    /// Create a new rectangle that can be rendered to the window.
+    /// Create a new circle that can be rendered to the window.
     /// 
     /// ### Arguments
     /// * `pos`: [Into]<[Vector]<[u16]>> - The topleft position.
@@ -92,5 +92,57 @@ impl Circle {
             c.set_outline_color(self.border_color.unwrap_or(Color::WHITE));
         }
         window.draw(&c);
+    }
+}
+
+
+pub struct Line {
+    start: Vector<u16>,
+    end: Vector<u16>,
+    color: Color,
+    thickness: u16,
+}
+impl Line {
+    /// Create a new line that can be rendered to the window.
+    /// 
+    /// ### Arguments
+    /// * `start`: [Into]<[Vector]<[u16]>> - The start position.
+    /// * `end`: [Into]<[Vector]<[u16]>> - The end position.
+    /// * `color`: [Color] - The fill color.
+    /// * `thickness`: [u16] - The lines thickness.
+    pub fn new<V: Into<Vector<u16>>>(start: V, end: V, color: Color, thickness: u16) -> Line {
+        Line { start: start.try_into().unwrap(), end: end.try_into().unwrap(), color, thickness }
+    }
+
+    /// Create a new line based on the start pos & direction vector.
+    /// 
+    /// ### Arguments
+    /// * `start`: [Into]<[Vector]<[u16]>> - The start position.
+    /// * `dir`: [Into]<[Vector]<[u16]>> - The direction vector.
+    /// * `color`: [Color] - The fill color.
+    /// * `thickness`: [u16] - The lines thickness.
+    pub fn from_vec<V: Into<Vector<u16>>>(start: V, dir: V, color: Color, thickness: u16) -> Line {
+        let start_v: Vector<u16> = start.try_into().unwrap();
+        let dir_v: Vector<u16> = dir.try_into().unwrap();
+        Line { start: start_v, end: start_v + dir_v, color, thickness }
+    }
+
+    /// Renders the line to the given window.
+    pub fn render(&self, window: &mut RenderWindow) {
+        let mut r = RectangleShape::new();
+        let start = self.start.cast::<f32>();
+        let end = self.end.cast::<f32>();
+
+        r.set_position((start.0, start.1));
+        r.set_origin((0., (self.thickness / 2) as f32));
+        r.set_size(Vector2f::new((start - end).mag(), self.thickness as f32));
+        r.set_fill_color(self.color);
+
+        // Calculate angle
+        let dir: Vector<f32> = (start - end).norm();
+        let angle = dir.1.atan2(dir.0).to_degrees() + 180.;
+        r.set_rotation(angle);
+
+        window.draw(&r);
     }
 }
