@@ -81,7 +81,7 @@ impl GuiConfig {
 /// * `title`: &[str] - The window title.
 /// * `config`: [Config] - The window config.
 /// * `app`: mut [App] - Your application struct.
-pub fn run<T: App> (title: &str, config: Config, gui_config: GuiConfig, mut app: T) {
+pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiConfig, mut app: T) {
     let mut window = RenderWindow::new(
         config.size,
         title,
@@ -90,6 +90,7 @@ pub fn run<T: App> (title: &str, config: Config, gui_config: GuiConfig, mut app:
         &Default::default(),
     );
     window.set_position(Vector2::new(config.pos.0, config.pos.1));
+    window.set_framerate_limit(max_fps);
     let mut gui = SfEgui::new(&window);
 
     while window.is_open() {

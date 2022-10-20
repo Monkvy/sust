@@ -43,5 +43,5 @@ impl sust::App for App {
 
 fn main() {
     let grid = sust::Grid::new(50, 50, 10);
-    sust::run("Sust window", grid.win_conf(), sust::GuiConfig::default(), App {grid});
+    sust::run("Sust window", 144, grid.win_conf(), sust::GuiConfig::default(), App {grid});
 }
