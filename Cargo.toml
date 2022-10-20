@@ -2,6 +2,8 @@
 name = "sust"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE.txt"
+description = "A 2d rust rendering engine powered by sfml & egui that mainly renders shapes. This can be used to visualize algorithms on a grid based surface"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
