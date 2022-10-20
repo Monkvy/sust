@@ -1,6 +1,6 @@
 use crate::{Vector, App, Style, Event, RenderWindow, Color, gui};
 use sfml::{
-    system::Vector2,
+    system::{Vector2, Clock},
     graphics::RenderTarget
 };
 use egui_sfml::SfEgui;
@@ -93,6 +93,7 @@ pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiCo
     window.set_framerate_limit(max_fps);
     let mut gui = SfEgui::new(&window);
 
+    let mut dt_clock = Clock::start();
     while window.is_open() {
 
         // Events
@@ -118,8 +119,8 @@ pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiCo
             app.gui(ctx);
         });
 
-        // TODO: Calculate dt
-        app.update(0.);
+        app.update(dt_clock.restart().as_seconds());
+
         window.clear(Color::BLACK);
         app.render(&mut window);
         gui.draw(&mut window, None);
