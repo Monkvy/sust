@@ -2,3 +2,5 @@
 .vscode
 tmp
 *.dll
+
+src/main.rs
