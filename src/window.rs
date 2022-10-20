@@ -1,4 +1,9 @@
-use crate::{Vector, App, Style, Event, RenderWindow, Color, gui, MOUSE_STATE};
+use crate::{
+    gui,
+    Vector, App,
+    Config, GuiConfig, State, MouseState,
+    Event, RenderWindow, Color,
+};
 use sfml::{
     system::{Vector2, Clock},
     graphics::RenderTarget
@@ -6,93 +11,35 @@ use sfml::{
 use egui_sfml::SfEgui;
 
 
-/// This struct stores the necessary window attributes.
-pub struct Config {
-    size: Vector<u16>,
-    pos: Vector<i32>,
-    style: Style
-}
-impl Config {
-    /// Create a config object based on all options.
-    /// 
-    /// ### Arguments
-    /// * `size`: [Into]<[Vector]<[u16]>> - The window size.
-    /// * `pos`: [Into]<[Vector]<[u16]>> - The window pos.
-    /// * `style`: Style - Additional sfml window style options.
-    pub fn new<Vu16: Into<Vector<u16>>, Vi32: Into<Vector<i32>>>(size: Vu16, pos: Vi32, style: Style) -> Config {
-        Config { size: size.try_into().unwrap(), pos: pos.try_into().unwrap(), style }
-    }
-
-    /// Create a config object based on the size.
-    /// All other attributes will be set to default.
-    /// 
-    /// ### Arguments
-    /// * `size`: [Into]<[Vector]<[u16]>> - The window size.
-    pub fn size<V: Into<Vector<u16>>>(size: V) -> Config {
-        Config { size: size.try_into().unwrap(), pos: Vector(150, 150), style: Style::CLOSE }
-    }
-
-    /// Create a config object based on the size & position.
-    /// All other attributes will be set to default.
-    /// 
-    /// ### Arguments
-    /// * `size`: [Into]<[Vector]<[u16]>> - The window size.
-    /// * `pos`: [Into]<[Vector]<[u16]>> - The window pos.
-    pub fn pos<Vu16: Into<Vector<u16>>, Vi32: Into<Vector<i32>>>(size: Vu16, pos: Vi32) -> Config {
-        Config { size: size.try_into().unwrap(), pos: pos.try_into().unwrap(), style: Style::CLOSE }
-    }
-
-    /// Create a config object.
-    /// The window size will be calculated automatically based on the grid size & scale.
-    pub fn grid(rows: u16, cols: u16, scale: u16) -> Config {
-        Config { size: Vector(cols * scale, rows * scale), pos: Vector(150, 150), style: Style::CLOSE }
-    }
-}
-
-
-#[derive(Clone)]
-pub struct GuiConfig {
-    pub heading: gui::FontId,
-    pub heading_2: gui::FontId,
-    pub context: gui::FontId,
-    pub body: gui::FontId,
-    pub monospace: gui::FontId,
-    pub button: gui::FontId,
-    pub small: gui::FontId
-}
-impl GuiConfig {
-    pub fn default() -> GuiConfig {
-        GuiConfig { 
-            heading:   gui::FontId::new(25., gui::FontFamily::Proportional),
-            heading_2: gui::FontId::new(22., gui::FontFamily::Proportional),
-            context:   gui::FontId::new(22., gui::FontFamily::Proportional),
-            body:      gui::FontId::new(22., gui::FontFamily::Proportional),
-            monospace: gui::FontId::new(22., gui::FontFamily::Proportional),
-            button:    gui::FontId::new(22., gui::FontFamily::Proportional),
-            small:     gui::FontId::new(22., gui::FontFamily::Proportional)
-        }
-    }
-}
-
-
 /// Runs the main loop of the window.
 /// 
 /// ### Arguments
-/// * `title`: &[str] - The window title.
 /// * `config`: [Config] - The window config.
+/// * `gui_config` [GuiConfig] - The Gui config.
 /// * `app`: mut [App] - Your application struct.
-pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiConfig, mut app: T) {
+pub fn run<T: App> (config: Config, gui_config: GuiConfig, mut app: T) {
+
+    // Window
     let mut window = RenderWindow::new(
         config.size,
-        title,
+        config.title.as_str(),
         config.style,
         &Default::default(),
     );
     window.set_position(Vector2::new(config.pos.0, config.pos.1));
-    window.set_framerate_limit(max_fps);
-    let mut gui = SfEgui::new(&window);
+    window.set_framerate_limit(config.max_fps);
 
+    // State
+    let mut gui = SfEgui::new(&window);
     let mut dt_clock = Clock::start();
+    let mut state = &mut State{
+        config, gui_config: gui_config.clone(),
+        mouse: MouseState{button: None, pos: Vector(0, 0)},
+        dt: 0.,
+        fps: 0.
+    };
+
+    // Main loop
     while window.is_open() {
 
         // Events
@@ -100,20 +47,26 @@ pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiCo
             gui.add_event(&event);
             match event {
                 Event::Closed => window.close(),
+
+                // Set state.mouse
                 Event::MouseButtonPressed { button, x, y } => {
-                    MOUSE_STATE.lock().unwrap().button = Some(button);
-                    MOUSE_STATE.lock().unwrap().pos = Vector(x as u16, y as u16);
+                    state.mouse.button = Some(button);
+                    state.mouse.pos = Vector(x as u16, y as u16);
                 }
                 Event::MouseButtonReleased { button: _, x, y } => {
-                    MOUSE_STATE.lock().unwrap().button = None;
-                    MOUSE_STATE.lock().unwrap().pos = Vector(x as u16, y as u16);
+                    state.mouse.button = None;
+                    state.mouse.pos = Vector(x as u16, y as u16);
                 }
-                Event::MouseMoved { x, y } if MOUSE_STATE.lock().unwrap().button.is_some() => {
-                    MOUSE_STATE.lock().unwrap().pos = Vector(x as u16, y as u16);
+                Event::MouseMoved { x, y } => {
+                    state.mouse.pos = Vector(x as u16, y as u16);
                 }
-                _ => { if app.events(event) {break;} }
+
+                // Call app.events
+                _ => { if app.events(state.clone(), event) { break; } }
             }
         }
+
+        // Gui
         gui.do_frame(|ctx| {
             let mut style = (*ctx.style()).clone();
             style.text_styles = [
@@ -126,13 +79,17 @@ pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiCo
                 (gui::TextStyle::Small,                   gui_config.clone().small),
             ].into();
             ctx.set_style(style);
-            app.gui(ctx);
+            app.gui(state.clone(), ctx);
         });
 
-        app.update(dt_clock.restart().as_seconds());
-
+        // Update
+        state.dt = dt_clock.restart().as_seconds();
+        state.fps = 1. / state.dt;
+        app.update(state.clone());
+        
+        // Render
         window.clear(Color::BLACK);
-        app.render(&mut window);
+        app.render(state.clone(), &mut window);
         gui.draw(&mut window, None);
         window.display();
     }

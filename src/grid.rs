@@ -1,4 +1,4 @@
-use crate::{Config, Color, Vector, RenderWindow, Rect};
+use crate::{Config, Color, Vector, RenderWindow, Rect, Style};
 
 
 /// Use this trait on a struct to uses it
@@ -33,8 +33,14 @@ impl<T: Cell + Clone> Grid<T> {
     }
 
     /// Get the window config based on the size & scale of the grid.
-    pub fn win_conf(&self) -> Config {
-        Config::grid(self.rows, self.cols, self.scale)
+    pub fn win_config(&self, title: String, win_pos: Option<Vector<i32>>) -> Config {
+        Config {
+            title,
+            size: Vector(self.cols * self.scale, self.rows * self.scale),
+            pos: win_pos.unwrap_or(Vector(150, 150)),
+            style: Style::CLOSE,
+            max_fps: 144
+        }
     }
 
     /// Get the rows & cols of this grid.

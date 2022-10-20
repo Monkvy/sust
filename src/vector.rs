@@ -9,7 +9,6 @@ pub struct Vector<T: num::Num> (pub T, pub T);
 
 
 impl<T: num::Num + num::NumCast + Copy> Vector<T> {
-
     /// Cast the x & y coordinates to the given type.
     /// 
     /// ### Generic Arguments

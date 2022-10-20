@@ -1,14 +1,14 @@
 
 struct App;
 impl sust::App for App {
-    fn events(&mut self, _event: sust::Event) -> bool { false }
-    fn update(&mut self, _dt: f32) {
-        println!("{:?}", sust::MOUSE_STATE.lock());
-    }
-    fn gui(&mut self, _ctx: &sust::gui::Context) {}
-    fn render(&self, _window: &mut sust::RenderWindow) {}
+    fn events(&mut self, _state: sust::State, _event: sust::Event) -> bool { false }
+    fn update(&mut self, _state: sust::State) {}
+    fn render(&self, _state: sust::State, _window: &mut sust::RenderWindow) {}
 }
 
 fn main() {
-    sust::run("Hello world", 144, sust::Config::size((800, 600)),sust::GuiConfig::default(), App);
+    sust::run( sust::Config {
+        title: String::from("Sust window"),
+        .. sust::Config::default()
+    }, sust::GuiConfig::default(), App);
 }

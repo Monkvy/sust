@@ -96,6 +96,8 @@ impl Circle {
 }
 
 
+/// This struct stores a line that
+/// can be rendered to the window.
 pub struct Line {
     start: Vector<u16>,
     end: Vector<u16>,
