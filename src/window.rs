@@ -50,13 +50,38 @@ impl Config {
 }
 
 
+#[derive(Clone)]
+pub struct GuiConfig {
+    pub heading: gui::FontId,
+    pub heading_2: gui::FontId,
+    pub context: gui::FontId,
+    pub body: gui::FontId,
+    pub monospace: gui::FontId,
+    pub button: gui::FontId,
+    pub small: gui::FontId
+}
+impl GuiConfig {
+    pub fn default() -> GuiConfig {
+        GuiConfig { 
+            heading:   gui::FontId::new(25., gui::FontFamily::Proportional),
+            heading_2: gui::FontId::new(22., gui::FontFamily::Proportional),
+            context:   gui::FontId::new(22., gui::FontFamily::Proportional),
+            body:      gui::FontId::new(22., gui::FontFamily::Proportional),
+            monospace: gui::FontId::new(22., gui::FontFamily::Proportional),
+            button:    gui::FontId::new(22., gui::FontFamily::Proportional),
+            small:     gui::FontId::new(22., gui::FontFamily::Proportional)
+        }
+    }
+}
+
+
 /// Runs the main loop of the window.
 /// 
 /// ### Arguments
 /// * `title`: &[str] - The window title.
 /// * `config`: [Config] - The window config.
 /// * `app`: mut [App] - Your application struct.
-pub fn run<T: App> (title: &str, config: Config, mut app: T) {
+pub fn run<T: App> (title: &str, config: Config, gui_config: GuiConfig, mut app: T) {
     let mut window = RenderWindow::new(
         config.size,
         title,
@@ -80,16 +105,15 @@ pub fn run<T: App> (title: &str, config: Config, mut app: T) {
         gui.do_frame(|ctx| {
             let mut style = (*ctx.style()).clone();
             style.text_styles = [
-                (gui::TextStyle::Heading,                 gui::FontId::new(16.0, gui::FontFamily::Proportional)),
-                (gui::TextStyle::Name("Heading".into()),  gui::FontId::new(16.0, gui::FontFamily::Proportional)),
-                (gui::TextStyle::Name("Context".into()),  gui::FontId::new(16.0, gui::FontFamily::Proportional)),
-                (gui::TextStyle::Body,                    gui::FontId::new(16.0, gui::FontFamily::Proportional)),
-                (gui::TextStyle::Monospace,               gui::FontId::new(16.0, gui::FontFamily::Proportional)),
-                (gui::TextStyle::Button,                  gui::FontId::new(16.0, gui::FontFamily::Proportional)),
-                (gui::TextStyle::Small,                   gui::FontId::new(14.0, gui::FontFamily::Proportional)),
+                (gui::TextStyle::Heading,                 gui_config.clone().heading),
+                (gui::TextStyle::Name("Heading2".into()), gui_config.clone().heading_2),
+                (gui::TextStyle::Name("Context".into()),  gui_config.clone().context),
+                (gui::TextStyle::Body,                    gui_config.clone().body),
+                (gui::TextStyle::Monospace,               gui_config.clone().monospace),
+                (gui::TextStyle::Button,                  gui_config.clone().button),
+                (gui::TextStyle::Small,                   gui_config.clone().small),
             ].into();
             ctx.set_style(style);
-            
             app.gui(ctx);
         });
 

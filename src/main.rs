@@ -20,5 +20,5 @@ impl sust::App for App {
 
 
 fn main() {
-    sust::run("Sust window", sust::Config::size((800, 600)), App{a:0.});
+    sust::run("Sust window", sust::Config::size((1200, 800)), sust::GuiConfig::default(), App{a:0.});
 }

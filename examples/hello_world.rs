@@ -8,5 +8,5 @@ impl sust::App for App {
 }
 
 fn main() {
-    sust::run("Hello world", sust::Config::size((800, 600)), App);
+    sust::run("Hello world", sust::Config::size((800, 600)),sust::GuiConfig::default(), App);
 }
