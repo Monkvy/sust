@@ -1,6 +1,6 @@
 [package]
 name = "sust"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 license-file = "LICENSE.txt"
 description = "A 2d rust rendering engine powered by sfml & egui that mainly renders shapes. This can be used to visualize algorithms on a grid based surface"

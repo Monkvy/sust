@@ -11,11 +11,10 @@ pub mod grid;
 pub use grid::*;
 
 pub use sfml::{
-    window::{Event, mouse, Style},
-    graphics::{RenderWindow, Color}
+    window::{Event, mouse, Style, Key},
+    graphics::{RenderWindow, Color},
 };
 pub use egui_sfml::egui as gui;
-//use lazy_static::lazy_static;
 use std::sync::Mutex;
 
 
