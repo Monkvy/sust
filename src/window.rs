@@ -39,6 +39,9 @@ pub fn run<T: App> (config: Config, gui_config: GuiConfig, mut app: T) {
         fps: 0.
     };
 
+    // Start event
+    app.start(state.clone());
+
     // Main loop
     while window.is_open() {
 
