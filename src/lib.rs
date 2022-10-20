@@ -15,7 +15,19 @@ pub use sfml::{
     graphics::{RenderWindow, Color}
 };
 pub use egui_sfml::egui as gui;
+//use lazy_static::lazy_static;
+use std::sync::Mutex;
 
+
+/// Stores the current mouse button & position.
+/// If button == None, the pos == to the mouse position
+/// of the last mouse press / release.
+#[derive(Debug, Clone, Copy)]
+pub struct MouseState {
+    pub button: Option<mouse::Button>,
+    pub pos: Vector<u16>
+}
+pub static MOUSE_STATE: Mutex<MouseState> = Mutex::new(MouseState{button: None, pos: Vector(0, 0)});
 
 /// Implement this trait to access, change & render data
 /// while inside the main loop of the window.

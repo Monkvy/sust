@@ -1,4 +1,4 @@
-use crate::{Vector, App, Style, Event, RenderWindow, Color, gui};
+use crate::{Vector, App, Style, Event, RenderWindow, Color, gui, MOUSE_STATE};
 use sfml::{
     system::{Vector2, Clock},
     graphics::RenderTarget
@@ -86,7 +86,6 @@ pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiCo
         config.size,
         title,
         config.style,
-        //Style::CLOSE,
         &Default::default(),
     );
     window.set_position(Vector2::new(config.pos.0, config.pos.1));
@@ -101,6 +100,14 @@ pub fn run<T: App> (title: &str, max_fps: u32, config: Config, gui_config: GuiCo
             gui.add_event(&event);
             match event {
                 Event::Closed => window.close(),
+                Event::MouseButtonPressed { button, x, y } => {
+                    MOUSE_STATE.lock().unwrap().button = Some(button);
+                    MOUSE_STATE.lock().unwrap().pos = Vector(x as u16, y as u16);
+                }
+                Event::MouseButtonReleased { button: _, x, y } => {
+                    MOUSE_STATE.lock().unwrap().button = None;
+                    MOUSE_STATE.lock().unwrap().pos = Vector(x as u16, y as u16);
+                }
                 _ => { if app.events(event) {break;} }
             }
         }
