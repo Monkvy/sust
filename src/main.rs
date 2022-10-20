@@ -5,6 +5,12 @@ impl sust::App for App {
     fn events(&mut self, _event: sust::Event) -> bool { false }
 
     fn update(&mut self, _dt: f32) {self.a+=0.1}
+    fn gui(&mut self, ctx: &sust::gui::Context) {
+        let win = sust::gui::Window::new("Sust gui window");
+        win.show(ctx, |ui|{
+            ui.button("asd")
+        });
+    }
     fn render(&self, window: &mut sust::RenderWindow) {
         sust::shape::Line::new((50, 50), (150, 100), sust::Color::RED, 2).render(window);
         sust::shape::Line::from_vec((50, 50), (150, 100), sust::Color::BLUE, 2).render(window);

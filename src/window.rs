@@ -1,8 +1,9 @@
-use crate::{Vector, App, Style, Event, RenderWindow, Color};
+use crate::{Vector, App, Style, Event, RenderWindow, Color, gui};
 use sfml::{
     system::Vector2,
     graphics::RenderTarget
 };
+use egui_sfml::SfEgui;
 
 
 /// This struct stores the necessary window attributes.
@@ -64,21 +65,39 @@ pub fn run<T: App> (title: &str, config: Config, mut app: T) {
         &Default::default(),
     );
     window.set_position(Vector2::new(config.pos.0, config.pos.1));
+    let mut gui = SfEgui::new(&window);
 
     while window.is_open() {
 
         // Events
         while let Some(event) = window.poll_event() {
+            gui.add_event(&event);
             match event {
                 Event::Closed => window.close(),
                 _ => { if app.events(event) {break;} }
             }
         }
+        gui.do_frame(|ctx| {
+            let mut style = (*ctx.style()).clone();
+            style.text_styles = [
+                (gui::TextStyle::Heading,                 gui::FontId::new(16.0, gui::FontFamily::Proportional)),
+                (gui::TextStyle::Name("Heading".into()),  gui::FontId::new(16.0, gui::FontFamily::Proportional)),
+                (gui::TextStyle::Name("Context".into()),  gui::FontId::new(16.0, gui::FontFamily::Proportional)),
+                (gui::TextStyle::Body,                    gui::FontId::new(16.0, gui::FontFamily::Proportional)),
+                (gui::TextStyle::Monospace,               gui::FontId::new(16.0, gui::FontFamily::Proportional)),
+                (gui::TextStyle::Button,                  gui::FontId::new(16.0, gui::FontFamily::Proportional)),
+                (gui::TextStyle::Small,                   gui::FontId::new(14.0, gui::FontFamily::Proportional)),
+            ].into();
+            ctx.set_style(style);
+            
+            app.gui(ctx);
+        });
 
         // TODO: Calculate dt
         app.update(0.);
         window.clear(Color::BLACK);
         app.render(&mut window);
+        gui.draw(&mut window, None);
         window.display();
     }
 }

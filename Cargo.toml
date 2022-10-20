@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 sfml = "0.18.1" # Graphics engine
 num = "0.4.0"   # Vector
+egui-sfml = "0.1.1" # Gui

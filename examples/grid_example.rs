@@ -33,9 +33,11 @@ impl sust::App for App {
     }
 
     fn update(&mut self, _dt: f32) {}
+    fn gui(&mut self, _ctx: &sust::gui::Context) {}
     fn render(&self, window: &mut sust::RenderWindow) {
         self.grid.render(window);
     }
+
 }
 
 
